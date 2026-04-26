@@ -15,7 +15,7 @@ async function startServer() {
 
   app.get("/api/locations", async (req, res) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/locations`);
+      const response = await fetch(`${API_BASE_URL}/locations?limit=1000`);
       const data = await response.json();
       res.json(data);
     } catch (error) {
@@ -26,7 +26,7 @@ async function startServer() {
 
   app.get("/api/menu", async (req, res) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/menu`);
+      const response = await fetch(`${API_BASE_URL}/menu?limit=1000`);
       const data = await response.json();
       res.json(data);
     } catch (error) {

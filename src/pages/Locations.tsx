@@ -74,7 +74,7 @@ export default function Locations() {
               FIND YOUR <br /> <span className="text-brand-primary">JOE'S.</span>
             </h1>
             <p className="text-lg text-gray-500 max-w-sm mb-12">
-              With 485+ locations across the country, a perfect cup of coffee is never far away.
+              With {allLocations.length || '485+'} locations across the country, a perfect cup of coffee is never far away.
             </p>
             
             <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center">
@@ -121,7 +121,7 @@ export default function Locations() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <AnimatePresence mode="popLayout">
-                {filteredLocations.slice(0, 50).map((loc, idx) => (
+                {filteredLocations.map((loc, idx) => (
                   <motion.div
                     key={`${loc.id}-${idx}`}
                     layout
@@ -177,14 +177,6 @@ export default function Locations() {
                   </motion.div>
                 ))}
               </AnimatePresence>
-            </div>
-          )}
-          
-          {filteredLocations.length > 50 && (
-            <div className="mt-12 text-center">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 bg-white inline-block px-6 py-2 rounded-full border border-black/5">
-                Showing top 50 results
-              </p>
             </div>
           )}
         </main>

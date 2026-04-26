@@ -10,7 +10,12 @@ export async function fetchLocations(): Promise<Location[]> {
       console.error(`API Error: ${response.status} ${response.statusText} at ${url}`);
       throw new Error('Failed to fetch locations');
     }
-    return response.json();
+    const data = await response.json();
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object' && Array.isArray((data as any).locations)) {
+      return (data as any).locations;
+    }
+    return [];
   } catch (error) {
     console.error('Fetch error (locations):', error);
     throw error;
