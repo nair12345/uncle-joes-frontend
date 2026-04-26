@@ -1,6 +1,6 @@
 import { Location, MenuItem } from '../types';
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
 
 export async function fetchLocations(): Promise<Location[]> {
   const url = `${API_BASE_URL}/locations`;
