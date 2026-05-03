@@ -10,8 +10,48 @@ async function startServer() {
   const app = express();
   const PORT = process.env.PORT || 3000;
 
+  // Middleware to parse JSON bodies
+  app.use(express.json());
+
   // API proxy logic
   const API_BASE_URL = process.env.API_BASE_URL || 'https://uncle-joes-api-374670707835.us-central1.run.app';
+
+  app.post("/api/login", async (req, res) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body)
+      });
+      const data = await response.json();
+      res.status(response.status).json(data);
+    } catch (error) {
+      console.error("Proxy error (login):", error);
+      res.status(500).json({ error: "Failed to login via backend" });
+    }
+  });
+
+  app.get("/api/members/:id/orders", async (req, res) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/members/${req.params.id}/orders`);
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error(`Proxy error (member orders ${req.params.id}):`, error);
+      res.status(500).json({ error: "Failed to fetch member orders" });
+    }
+  });
+
+  app.get("/api/members/:id/points", async (req, res) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/members/${req.params.id}/points`);
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error(`Proxy error (member points ${req.params.id}):`, error);
+      res.status(500).json({ error: "Failed to fetch member points" });
+    }
+  });
 
   app.get("/api/locations", async (req, res) => {
     try {

@@ -44,12 +44,25 @@ export default function Locations() {
     });
   }, [allLocations, citySearch, selectedState]);
 
-  const formatTime = (timeStr: string | null | undefined) => {
-    if (!timeStr) return '';
-    // Format "HHmm" to "HH:mm"
-    if (timeStr.length === 4) {
-      return `${timeStr.slice(0, 2)}:${timeStr.slice(2)}`;
+  const formatTime = (time: string | number | null | undefined) => {
+    if (time === null || time === undefined || time === '') return '';
+    
+    // Ensure we have a string like "0530" or "2000"
+    let timeStr = String(time);
+    
+    // Pad with leading zero if needed (e.g., "530" -> "0530")
+    if (timeStr.length === 3) {
+      timeStr = '0' + timeStr;
     }
+    
+    if (timeStr.length === 4) {
+      const hours = parseInt(timeStr.slice(0, 2));
+      const minutes = timeStr.slice(2);
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+      return `${displayHours}:${minutes} ${ampm}`;
+    }
+    
     return timeStr;
   };
 

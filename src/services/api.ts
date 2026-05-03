@@ -1,4 +1,4 @@
-import { Location, MenuItem } from '../types';
+import { Location, MenuItem, Member, Order, LoginResponse } from '../types';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
 
@@ -64,6 +64,49 @@ export async function fetchMenuItemById(id: string): Promise<MenuItem> {
     return response.json();
   } catch (error) {
     console.error(`Fetch error (menu item ${id}):`, error);
+    throw error;
+  }
+}
+
+export async function login(email: string, password: string): Promise<LoginResponse> {
+  const url = `${API_BASE_URL}/login`;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail?.[0]?.msg || errorData.detail || 'Login failed');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+}
+
+export async function fetchMemberOrders(memberId: string): Promise<Order[]> {
+  const url = `${API_BASE_URL}/members/${memberId}/orders`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch orders');
+    return response.json();
+  } catch (error) {
+    console.error(`Fetch error (orders for ${memberId}):`, error);
+    throw error;
+  }
+}
+
+export async function fetchMemberPoints(memberId: string): Promise<{ points: number }> {
+  const url = `${API_BASE_URL}/members/${memberId}/points`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch points');
+    return response.json();
+  } catch (error) {
+    console.error(`Fetch error (points for ${memberId}):`, error);
     throw error;
   }
 }

@@ -1,9 +1,30 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Menu as MenuIcon, Search } from 'lucide-react';
+import { Menu as MenuIcon, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Member } from '../types';
 
 export default function Navbar() {
   const location = useLocation();
+  const [user, setUser] = useState<Member | null>(null);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('uj_member');
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error("Failed to parse user", e);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('uj_member');
+    localStorage.removeItem('uj_token');
+    setUser(null);
+    window.location.reload();
+  };
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -48,6 +69,29 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          {user ? (
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:block text-right">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Rewards</p>
+                <p className="text-sm font-bold text-brand-primary leading-none">{user.points || 0} pts</p>
+              </div>
+              <button 
+                onClick={handleLogout}
+                className="flex items-center gap-2 bg-brand-muted px-3 py-2 rounded-xl hover:bg-red-50 hover:text-red-600 transition-colors group"
+                title="Logout"
+              >
+                <User size={18} className="group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-bold">Sign Out</span>
+              </button>
+            </div>
+          ) : (
+            <Link 
+              to="/login"
+              className="bg-brand-dark text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+              Sign In
+            </Link>
+          )}
           <button className="md:hidden p-2 text-brand-dark">
             <MenuIcon size={20} />
           </button>

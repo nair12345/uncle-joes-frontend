@@ -1,7 +1,20 @@
-Team Members: Aditya Nair, Lucas Gerbsch, Matthew Pierce, Varun Ram
-# uncle-joes-frontend
-Our MGMT 545 team has been tasked with creating a web application for Uncle Joe's Coffee Shop, a fictional regional coffee chain with roughly 500 locations across the upper Midwest. The coffee chain has decided that they would like to modernize their systems and roll out a new platform for their customers and managers to utilize, so it's up to us to create this initial pilot version before it's pushed for broader use. This repo will contain materials relating to our frontend for this project including code and documentation as we progress through the next couple weeks. The frontend will have a variety of pages to enhance the User experience. There will be a login page and a signup if new users want to come and become a member.  
-Once a member is logged in it will have the following features:  
-**An order page** - they will have the ability to place orders and utilize search filters to find desired items in an easier fashion  
-**Previous Order Page** - They will have the opportunity to view previous orders and how much they spent on that order  
-**Point System** - A point system is added to prioritize customer retentions. Based on how much they spend on their order, a point system will be calculated and can be used to purchase items on the menu
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
+
+# Run and deploy your AI Studio app
+
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/3ba5f660-9637-4150-b6ec-679865f18171
+
+## Run Locally
+
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

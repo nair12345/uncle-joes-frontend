@@ -3,22 +3,49 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
 import Menu from './pages/Menu';
 import Locations from './pages/Locations';
+import Login from './pages/Login';
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!localStorage.getItem('uj_member'));
+
+  useEffect(() => {
+    // Check auth status periodically or listen to custom events if needed
+    const checkAuth = () => {
+      setIsLoggedIn(!!localStorage.getItem('uj_member'));
+    };
+    window.addEventListener('storage', checkAuth);
+    return () => window.removeEventListener('storage', checkAuth);
+  }, []);
+
+  if (!isLoggedIn) {
+    return (
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </Router>
+    );
+  }
+
   return (
     <Router>
       <div className="min-h-screen bg-brand-muted">
         <Navbar />
         <main>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/home" element={<Navigate to="/" replace />} />
             <Route path="/menu" element={<Menu />} />
             <Route path="/locations" element={<Locations />} />
+            <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
         
