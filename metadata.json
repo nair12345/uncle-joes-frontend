@@ -1,6 +1,6 @@
 {
   "name": "Uncle Joe's",
-  "description": "Premium store locator and menu browser for Uncle Joe's locations.",
+  "description": "Uncle Joe's rewards portal featuring a personalized dashboard, order history, and points tracking.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

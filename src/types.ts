@@ -68,3 +68,16 @@ export interface LoginResponse {
   token_type?: string;
   member: Member;
 }
+
+export interface CreateOrderRequest {
+  member_id: string;
+  store_id: string;
+  items: OrderItemRequest[];
+}
+
+export interface OrderItemRequest {
+  menu_item_id: string;
+  quantity: number;
+  price: number;
+  size: string;
+}

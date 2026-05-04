@@ -1,22 +1,35 @@
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { Menu as MenuIcon, User } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Menu as MenuIcon, User, ShoppingBag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Member } from '../types';
+import { useCart } from '../CartContext';
 
 export default function Navbar() {
   const location = useLocation();
   const [user, setUser] = useState<Member | null>(null);
+  const { itemsCount } = useCart();
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('uj_member');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        console.error("Failed to parse user", e);
+    const handleSync = () => {
+      const savedUser = localStorage.getItem('uj_member');
+      if (savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch (e) {
+          console.error("Failed to parse user", e);
+        }
       }
-    }
+    };
+
+    handleSync();
+    window.addEventListener('uj_user_updated', handleSync);
+    window.addEventListener('storage', handleSync);
+    
+    return () => {
+      window.removeEventListener('uj_user_updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -69,6 +82,22 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link to="/cart" className="relative p-2 bg-brand-muted rounded-xl hover:bg-brand-primary/10 transition-colors group">
+            <ShoppingBag size={20} className="text-brand-dark group-hover:text-brand-primary transition-colors" />
+            <AnimatePresence>
+              {itemsCount > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  className="absolute -top-1 -right-1 bg-brand-primary text-brand-dark text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white"
+                >
+                  {itemsCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Link>
+
           {user ? (
             <div className="flex items-center gap-4">
               <div className="hidden sm:block text-right">

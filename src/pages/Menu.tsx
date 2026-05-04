@@ -1,8 +1,10 @@
 import { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AlertCircle, Search, ChevronRight, Info, Plus } from 'lucide-react';
+import { AlertCircle, Search, ChevronRight, Info, Plus, Loader2, CheckCircle2, ShoppingBag } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { fetchMenu } from '../services/api';
-import { MenuItem, MenuCategory } from '../types';
+import { MenuItem, MenuCategory, Member } from '../types';
+import { useCart } from '../CartContext';
 
 export default function Menu() {
   const [categories, setCategories] = useState<MenuCategory[]>([]);
@@ -10,8 +12,16 @@ export default function Menu() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [addedItem, setAddedItem] = useState<string | null>(null);
+  const [user, setUser] = useState<Member | null>(null);
+  const { addToCart, itemsCount } = useCart();
 
   useEffect(() => {
+    const savedUser = localStorage.getItem('uj_member');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+
     async function loadMenu() {
       try {
         const items = await fetchMenu();
@@ -67,6 +77,13 @@ export default function Menu() {
     }
     return names;
   }, [categories]);
+
+  const handleAddToCart = (item: MenuItem) => {
+    addToCart(item);
+    const id = item.id || (item as any).item_id;
+    setAddedItem(id);
+    setTimeout(() => setAddedItem(null), 1500);
+  };
 
   if (loading) {
     return (
@@ -186,6 +203,23 @@ export default function Menu() {
                               <Info size={10} /> {item.calories} Cal
                             </span>
                           </div>
+
+                          {user && (
+                            <button
+                              onClick={() => handleAddToCart(item)}
+                              className={`p-3 rounded-2xl transition-all ${
+                                addedItem === (item.id || (item as any).item_id)
+                                  ? 'bg-green-500 text-white'
+                                  : 'bg-brand-dark text-white hover:bg-brand-primary hover:text-brand-dark shadow-lg shadow-brand-dark/10'
+                              }`}
+                            >
+                              {addedItem === (item.id || (item as any).item_id) ? (
+                                <CheckCircle2 size={18} />
+                              ) : (
+                                <Plus size={18} />
+                              )}
+                            </button>
+                          )}
                         </div>
                       </motion.div>
                     ))}
@@ -196,6 +230,28 @@ export default function Menu() {
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {itemsCount > 0 && (
+          <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-8 left-0 right-0 z-40 px-4 md:hidden"
+          >
+            <Link 
+              to="/cart"
+              className="bg-brand-dark text-white flex items-center justify-between p-5 rounded-3xl shadow-2xl"
+            >
+              <div className="flex items-center gap-3">
+                <ShoppingBag size={20} className="text-brand-primary" />
+                <span className="font-bold">View Cart ({itemsCount})</span>
+              </div>
+              <ChevronRight size={20} />
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

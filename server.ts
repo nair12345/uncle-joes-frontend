@@ -33,7 +33,11 @@ async function startServer() {
 
   app.get("/api/members/:id/orders", async (req, res) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/members/${req.params.id}/orders`);
+      const query = new URLSearchParams(req.query as any).toString();
+      const url = `${API_BASE_URL}/members/${req.params.id}/orders${query ? `?${query}` : ''}`;
+      const response = await fetch(url, {
+        headers: req.headers.authorization ? { 'Authorization': req.headers.authorization } : {}
+      });
       const data = await response.json();
       res.json(data);
     } catch (error) {
@@ -44,7 +48,11 @@ async function startServer() {
 
   app.get("/api/members/:id/points", async (req, res) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/members/${req.params.id}/points`);
+      const query = new URLSearchParams(req.query as any).toString();
+      const url = `${API_BASE_URL}/members/${req.params.id}/points${query ? `?${query}` : ''}`;
+      const response = await fetch(url, {
+        headers: req.headers.authorization ? { 'Authorization': req.headers.authorization } : {}
+      });
       const data = await response.json();
       res.json(data);
     } catch (error) {
@@ -55,7 +63,9 @@ async function startServer() {
 
   app.get("/api/locations", async (req, res) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/locations?limit=1000`);
+      const query = new URLSearchParams(req.query as any).toString();
+      const url = `${API_BASE_URL}/locations?${query || 'limit=1000'}`;
+      const response = await fetch(url);
       const data = await response.json();
       res.json(data);
     } catch (error) {
@@ -66,7 +76,9 @@ async function startServer() {
 
   app.get("/api/menu", async (req, res) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/menu?limit=1000`);
+      const query = new URLSearchParams(req.query as any).toString();
+      const url = `${API_BASE_URL}/menu?${query || 'limit=1000'}`;
+      const response = await fetch(url);
       const data = await response.json();
       res.json(data);
     } catch (error) {
@@ -94,6 +106,40 @@ async function startServer() {
     } catch (error) {
       console.error(`Proxy error (menu item ${req.params.id}):`, error);
       res.status(500).json({ error: "Failed to fetch menu item from backend" });
+    }
+  });
+
+  app.post("/api/orders", async (req, res) => {
+    try {
+      const headers: Record<string, string> = { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      };
+      if (req.headers.authorization) {
+        headers['Authorization'] = req.headers.authorization;
+      }
+
+      console.log(`[PROXY] Creating order at ${API_BASE_URL}/orders`);
+      console.log(`[PROXY] Payload:`, JSON.stringify(req.body, null, 2));
+
+      const response = await fetch(`${API_BASE_URL}/orders`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(req.body)
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        console.error(`[PROXY] API Error ${response.status}:`, JSON.stringify(data, null, 2));
+        return res.status(response.status).json(data);
+      }
+
+      console.log(`[PROXY] Order created successfully:`, JSON.stringify(data, null, 2));
+      res.status(response.status).json(data);
+    } catch (error) {
+      console.error("[PROXY] Connection error (create order):", error);
+      res.status(500).json({ error: "Failed to connect to backend", detail: String(error) });
     }
   });
 

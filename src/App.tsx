@@ -5,11 +5,13 @@
 
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { CartProvider } from './CartContext';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Menu from './pages/Menu';
 import Locations from './pages/Locations';
 import Login from './pages/Login';
+import Cart from './pages/Cart';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!localStorage.getItem('uj_member'));
@@ -35,19 +37,21 @@ export default function App() {
   }
 
   return (
-    <Router>
-      <div className="min-h-screen bg-brand-muted">
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/home" element={<Navigate to="/" replace />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/locations" element={<Locations />} />
-            <Route path="/login" element={<Navigate to="/" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
+    <CartProvider>
+      <Router>
+        <div className="min-h-screen bg-brand-muted">
+          <Navbar />
+          <main>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/home" element={<Navigate to="/" replace />} />
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/locations" element={<Locations />} />
+              <Route path="/login" element={<Navigate to="/" replace />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
         
         {/* Footer */}
         <footer className="max-w-7xl mx-auto px-4 py-20">
@@ -66,5 +70,6 @@ export default function App() {
         </footer>
       </div>
     </Router>
+    </CartProvider>
   );
 }
