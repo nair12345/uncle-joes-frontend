@@ -225,9 +225,6 @@ export default function Dashboard() {
                 </div>
                 <h3 className="text-xl font-display font-bold text-brand-dark">Order History</h3>
               </div>
-              <button className="text-brand-primary font-bold text-sm hover:underline flex items-center gap-1 group">
-                View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
             </div>
 
             {error ? (

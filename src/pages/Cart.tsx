@@ -47,8 +47,9 @@ export default function Cart() {
         }))
       });
 
-      setIsSuccess(true);
+      console.log('Order created successfully, clearing cart...');
       clearCart();
+      setIsSuccess(true);
     } catch (err: any) {
       console.error("Order completion error:", err);
       setError(err.message);
