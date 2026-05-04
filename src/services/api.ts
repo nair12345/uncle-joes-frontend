@@ -247,11 +247,35 @@ export async function fetchMemberPoints(memberId: string): Promise<number> {
 
 export async function createOrder(orderRequest: CreateOrderRequest): Promise<any> {
   const url = `${API_BASE_URL}/orders`;
+  
+  // Defensive type matching for BigQuery
+  const payload = {
+    member_id: String(orderRequest.member_id),
+    store_id: String(orderRequest.store_id),
+    order_id: `WEB-${Date.now()}`,
+    order_date: new Date().toISOString(), // Full ISO timestamp "YYYY-MM-DDTHH:mm:ss.sssZ"
+    order_total: Number(orderRequest.items.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0)),
+    total_amount: Number(orderRequest.items.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0)),
+    status: 'Completed',
+    // Detailed items structure matched to backend expectations
+    items: orderRequest.items.map(item => ({
+      item_id: String(item.menu_item_id),
+      menu_item_id: isNaN(Number(item.menu_item_id)) ? item.menu_item_id : Number(item.menu_item_id),
+      item_quantity: Number(item.quantity) || 1,
+      quantity: Number(item.quantity) || 1,
+      item_price: Number(item.price) || 0,
+      price: Number(item.price) || 0,
+      size: String(item.size || 'Regular')
+    }))
+  };
+
+  console.log('Sending order payload to BigQuery-backed API:', JSON.stringify(payload, null, 2));
+
   try {
     const response = await fetchWithTimeout(url, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify(orderRequest)
+      body: JSON.stringify(payload)
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
